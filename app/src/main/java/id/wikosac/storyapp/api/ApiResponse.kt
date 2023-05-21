@@ -34,6 +34,6 @@ data class StoryResponse(
     @field:SerializedName("message")
     val message: String,
 
-    @field:SerializedName("loginResult")
+    @field:SerializedName("listStory")
     val listStory: List<Story>
 )
