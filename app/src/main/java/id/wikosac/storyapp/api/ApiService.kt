@@ -24,7 +24,7 @@ interface ApiService {
     fun login(
         @Field("email") email : String,
         @Field("password") password : String,
-        ): Call<UserInfo>
+        ): Call<LoginResponse>
 
     @GET("stories")
     fun getAllStories()

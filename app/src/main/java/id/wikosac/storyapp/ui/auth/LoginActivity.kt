@@ -1,11 +1,15 @@
 package id.wikosac.storyapp.ui.auth
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import id.wikosac.storyapp.MainActivity
 import id.wikosac.storyapp.R
 import id.wikosac.storyapp.databinding.ActivityLoginBinding
 import id.wikosac.storyapp.ui.custom.EmailEditText
@@ -27,8 +31,15 @@ class LoginActivity : AppCompatActivity() {
         edPass = findViewById(R.id.ed_login_password)
         binding.btnLogin.setOnClickListener {
             loginViewModel.login(edEmail.text.toString(), edPass.text.toString())
-            Log.d("Login", "onCreate: ${loginViewModel.loginInfo}")
 //            Toast.makeText(this@LoginActivity, email, Toast.LENGTH_SHORT).show()
+        }
+        loginViewModel.loginInfo.observe(this) {
+            Log.d("Login", "onCreate: ${loginViewModel.loginInfo.value}")
+            if (it.message == "success") {
+                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                intent.putExtra("token", it.loginResult.token)
+                startActivity(intent)
+            }
         }
 
         setMyButtonEnable()
