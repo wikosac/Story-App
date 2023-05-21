@@ -1,5 +1,6 @@
 package id.wikosac.storyapp.ui.dashboard
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -29,9 +30,9 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val intent = requireActivity().intent
-        val token = intent.getStringExtra("token").toString()
-        dashboardViewModel.getStory(token)
+        val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
+        val tokenPref = sharedPreferences.getString("TOKEN", "")
+        dashboardViewModel.getStory(tokenPref!!)
 
         val textView: TextView = binding.textDashboard
         dashboardViewModel.storyList.observe(viewLifecycleOwner) {

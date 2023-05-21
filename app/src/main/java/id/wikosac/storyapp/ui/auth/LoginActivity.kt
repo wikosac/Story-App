@@ -1,5 +1,6 @@
 package id.wikosac.storyapp.ui.auth
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -28,18 +29,29 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val sharedPreferences = getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
+        val tokenPref = sharedPreferences.getString("TOKEN", "")
+        if (tokenPref != "") {
+            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+            finish()
+        }
+
         edEmail = findViewById(R.id.ed_login_email)
         edPass = findViewById(R.id.ed_login_password)
         binding.btnLogin.setOnClickListener {
             loginViewModel.login(edEmail.text.toString(), edPass.text.toString())
-//            Toast.makeText(this@LoginActivity, email, Toast.LENGTH_SHORT).show()
         }
         loginViewModel.loginInfo.observe(this) {
             Log.d("Login", "onCreate: ${loginViewModel.loginInfo.value}")
             if (it.message == "success") {
                 val intent = Intent(this@LoginActivity, MainActivity::class.java)
                 intent.putExtra("token", it.loginResult.token)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)
+                finish()
+                saveLoginSession(this, it.loginResult.token)
             }
         }
 
@@ -88,4 +100,10 @@ class LoginActivity : AppCompatActivity() {
         return pass.length >= 8
     }
 
+    private fun saveLoginSession(context: Context, token: String) {
+        val sharedPref = context.getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        editor.putString("TOKEN", token)
+        editor.apply()
+    }
 }
