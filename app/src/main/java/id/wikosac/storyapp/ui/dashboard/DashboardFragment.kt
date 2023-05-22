@@ -30,17 +30,8 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
-        val tokenPref = sharedPreferences.getString("TOKEN", "")
-        dashboardViewModel.getStory(tokenPref!!)
-
         val textView: TextView = binding.textDashboard
-        dashboardViewModel.storyList.observe(viewLifecycleOwner) {
-            Log.d(MainActivity.TAG, "onCreateView: ${dashboardViewModel.storyList.value}")
-            if (dashboardViewModel.storyList.value != null) {
-                textView.text = it[0].toString()
-            }
-        }
+
         return root
     }
 
