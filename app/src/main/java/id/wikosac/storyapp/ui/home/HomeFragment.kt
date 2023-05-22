@@ -7,23 +7,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import id.wikosac.storyapp.MainActivity
 import id.wikosac.storyapp.api.Story
 import id.wikosac.storyapp.databinding.FragmentHomeBinding
+import id.wikosac.storyapp.ui.custom.DividerItemDecorator
+import id.wikosac.storyapp.ui.detail.DetailActivity
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -37,8 +32,10 @@ class HomeFragment : Fragment() {
         val root: View = binding.root
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val itemDecorator = DividerItemDecorator()
         binding.recyclerView.addItemDecoration(
-            DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
+            itemDecorator
+//            DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
         )
 
         val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
@@ -52,10 +49,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-//        val textView: TextView = binding.textHome
-//        homeViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
         return root
     }
 
@@ -69,17 +62,18 @@ class HomeFragment : Fragment() {
         binding.recyclerView.adapter = adapter
         adapter.setOnItemClickCallback(object : HomeAdapter.OnItemClickCallback {
             override fun onItemClicked(data: Story) {
-//                showSelected(data.id, data.login, data.avatarUrl)
-                Toast.makeText(requireContext(), data.name, Toast.LENGTH_SHORT).show()
+                detail(data.photoUrl, data.name, data.description, data.createdAt)
+//                Toast.makeText(requireContext(), data.name, Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-//    private fun showSelected(id: Int?, nickname: String, avatarUrl: String) {
-//        val moveWithObjectIntent = Intent(requireActivity(), DetailActivity::class.java)
-//        moveWithObjectIntent.putExtra(DetailActivity.EXTRA_ID, id)
-//        moveWithObjectIntent.putExtra(DetailActivity.EXTRA_ITEM, nickname)
-//        moveWithObjectIntent.putExtra(DetailActivity.EXTRA_AVA, avatarUrl)
-//        startActivity(moveWithObjectIntent)
-//    }
+    private fun detail(img: String?, name: String?, desc: String?, time: String?) {
+        val intent = Intent(requireActivity(), DetailActivity::class.java)
+        intent.putExtra("IMG", img)
+        intent.putExtra("NAME", name)
+        intent.putExtra("DESC", desc)
+        intent.putExtra("TIME", time)
+        startActivity(intent)
+    }
 }
