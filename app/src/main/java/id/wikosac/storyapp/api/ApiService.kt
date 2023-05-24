@@ -11,21 +11,23 @@ interface ApiService {
     fun uploadImage(
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
-        @Part("description") description: RequestBody,
+        @Part("description") description: RequestBody
     ): Call<ApiResponse>
 
-    @Headers("Content-Type: application/json")
+    @FormUrlEncoded
     @POST("register")
     fun register(
-        @Body userData: UserInfo
+        @Field("name") name : String,
+        @Field("email") email : String,
+        @Field("password") password : String
     ): Call<ApiResponse>
 
     @FormUrlEncoded
     @POST("login")
     fun login(
         @Field("email") email : String,
-        @Field("password") password : String,
-        ): Call<LoginResponse>
+        @Field("password") password : String
+    ): Call<LoginResponse>
 
     @GET("stories")
     fun getAllStories(

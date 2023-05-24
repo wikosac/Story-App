@@ -20,11 +20,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import id.wikosac.storyapp.MainActivity
+import id.wikosac.storyapp.R
 import id.wikosac.storyapp.api.ApiConfig
 import id.wikosac.storyapp.api.ApiResponse
 import id.wikosac.storyapp.databinding.FragmentUploadBinding
+import id.wikosac.storyapp.ui.detail.DetailActivity
+import id.wikosac.storyapp.ui.home.HomeFragment
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -40,6 +46,7 @@ class UploadFragment : Fragment() {
     private var _binding: FragmentUploadBinding? = null
     private val binding get() = _binding!!
     private var getFile: File? = null
+    private val viewModel : UploadViewModel by viewModels()
 
     companion object {
         const val TAG = "image"
@@ -75,12 +82,12 @@ class UploadFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val uploadViewModel = ViewModelProvider(this)[UploadViewModel::class.java]
-
         _binding = FragmentUploadBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-//        val textView: TextView = binding.textDashboard
+        val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
+        val tokenPref = sharedPreferences.getString("TOKEN", "").toString()
+
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
                 requireActivity(),
@@ -89,9 +96,11 @@ class UploadFragment : Fragment() {
             )
         }
 
-        binding.btnCamera.setOnClickListener { startTakePhoto() }
-        binding.btnGallery.setOnClickListener { startGallery() }
-        binding.btnUpload.setOnClickListener { uploadImage() }
+        with(binding) {
+            btnCamera.setOnClickListener { startTakePhoto() }
+            btnGallery.setOnClickListener { startGallery() }
+            btnUpload.setOnClickListener { uploadImage(tokenPref) }
+        }
 
         return root
     }
@@ -120,11 +129,20 @@ class UploadFragment : Fragment() {
         launcherIntentGallery.launch(chooser)
     }
 
-    private fun uploadImage() {
+    private fun uploadImage(token: String) {
+        val desc = binding.descView.text.toString()
+        Log.d("up", "desc: $desc")
+
+
         if (getFile != null) {
+            if (desc.isBlank()) {
+                Toast.makeText(requireContext(), "Please fill in the description", Toast.LENGTH_SHORT).show()
+                return
+            }
+
             val file = reduceFileImage(getFile as File)
 
-            val description = "Ini adalah deksripsi gambar".toRequestBody("text/plain".toMediaType())
+            val description = desc.toRequestBody("text/plain".toMediaType())
             val requestImageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
             val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
                 "photo",
@@ -132,32 +150,18 @@ class UploadFragment : Fragment() {
                 requestImageFile
             )
 
-            val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
-            val tokenPref = sharedPreferences.getString("TOKEN", "").toString()
-            val service = ApiConfig.getApiService().uploadImage("Bearer $tokenPref", imageMultipart, description)
+            viewModel.upload(token, imageMultipart, description)
 
-            service.enqueue(object : Callback<ApiResponse> {
-                override fun onResponse(
-                    call: Call<ApiResponse>,
-                    response: Response<ApiResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val responseBody = response.body()
-                        if (responseBody != null && !responseBody.error) {
-                            Toast.makeText(requireContext(), responseBody.message, Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        Log.d(TAG, "onResponse: ${response.message()}")
-                        Toast.makeText(requireContext(), response.message(), Toast.LENGTH_SHORT).show()
-                    }
-                    Log.d(TAG, "onResponse: $response")
+            viewModel.message.observe(viewLifecycleOwner) {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                if (it.equals("Story created successfully")) {
+                    val intent = Intent(requireContext(), MainActivity::class.java)
+                    startActivity(intent)
                 }
-                override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
-                    Toast.makeText(requireContext(), "Gagal instance Retrofit", Toast.LENGTH_SHORT).show()
-                }
-            })
+            }
+
         } else {
-            Toast.makeText(requireContext(), "Silakan masukkan berkas gambar terlebih dahulu.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Please insert an image file first", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -169,8 +173,7 @@ class UploadFragment : Fragment() {
             val myFile = File(currentPhotoPath)
 
             myFile.let { file ->
-//              Silakan gunakan kode ini jika mengalami perubahan rotasi
-//              rotateFile(file)
+                rotateFile(file)
                 getFile = file
                 binding.previewImageView.setImageBitmap(BitmapFactory.decodeFile(file.path))
             }
@@ -184,6 +187,7 @@ class UploadFragment : Fragment() {
             val selectedImg = result.data?.data as Uri
             selectedImg.let { uri ->
                 val myFile = uriToFile(uri, requireContext())
+                rotateFile(myFile)
                 getFile = myFile
                 binding.previewImageView.setImageURI(uri)
             }

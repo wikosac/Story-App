@@ -1,38 +1,45 @@
 package id.wikosac.storyapp.ui.upload
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import id.wikosac.storyapp.api.ApiConfig
-import id.wikosac.storyapp.api.Story
-import id.wikosac.storyapp.api.StoryResponse
+import id.wikosac.storyapp.api.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class UploadViewModel : ViewModel() {
 
-    private val _storyList = MutableLiveData<List<Story>>()
-    val storyList: LiveData<List<Story>> = _storyList
+    private val _message = MutableLiveData<String>()
+    val message: LiveData<String> = _message
 
     companion object{
-        private const val TAG = "DashboardViewModel"
+        private const val TAG = "upload"
     }
 
-    fun getStory(token: String) {
-        val client = ApiConfig.getApiService().getAllStories("Bearer $token")
-        client.enqueue(object : Callback<StoryResponse> {
-            override fun onResponse(call: Call<StoryResponse>, response: Response<StoryResponse>) {
+    fun upload(token: String, file: MultipartBody.Part, desc: RequestBody) {
+        val service = ApiConfig.getApiService().uploadImage("Bearer $token", file, desc)
+        service.enqueue(object : Callback<ApiResponse> {
+            override fun onResponse(
+                call: Call<ApiResponse>,
+                response: Response<ApiResponse>
+            ) {
                 if (response.isSuccessful) {
-                    _storyList.value = response.body()?.listStory
-                    Log.d(TAG, "onResponse: ${_storyList.value}")
+                    val responseBody = response.body()
+                    if (responseBody != null && !responseBody.error) {
+                        _message.value = responseBody.message
+                    }
                 } else {
-                    Log.e(TAG, "onFailurei: ${response.message()}")
+                    _message.value = response.message()
                 }
+                Log.d(TAG, "onResponse: ${response.body()}")
             }
-            override fun onFailure(call: Call<StoryResponse>, t: Throwable) {
-                Log.e(TAG, "onFailuree: ${t.message.toString()}")
+            override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+                _message.value = t.message.toString()
             }
         })
     }

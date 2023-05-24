@@ -6,8 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import id.wikosac.storyapp.api.ApiConfig
 import id.wikosac.storyapp.api.LoginResponse
-import id.wikosac.storyapp.api.UserInfo
-import id.wikosac.storyapp.ui.custom.PassEditText
+import id.wikosac.storyapp.ui.upload.UploadViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,6 +15,8 @@ class LoginViewModel: ViewModel() {
 
     private val _loginInfo = MutableLiveData<LoginResponse>()
     val loginInfo: LiveData<LoginResponse> = _loginInfo
+    private val _message = MutableLiveData<String>()
+    val message: LiveData<String> = _message
 
     companion object{
         private const val TAG = "LoginViewModel"
@@ -27,13 +28,13 @@ class LoginViewModel: ViewModel() {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful) {
                     _loginInfo.value = response.body()
-                    Log.d(TAG, "onResponse: ${_loginInfo.value}")
+                    _message.value = _loginInfo.value?.message.toString()
                 } else {
-                    Log.e(TAG, "onFailurei: ${response.message()}")
+                    _message.value = response.message()
                 }
             }
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                Log.e(TAG, "onFailuree: ${t.message.toString()}")
+                _message.value = t.message.toString()
             }
         })
     }
