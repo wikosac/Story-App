@@ -18,7 +18,7 @@ class UploadViewModel : ViewModel() {
     val message: LiveData<String> = _message
 
     fun upload(token: String, file: MultipartBody.Part, desc: RequestBody) {
-        val service = ApiConfig.getApiService().uploadImage("Bearer $token", file, desc)
+        val service = ApiConfig.getApiService().upload("Bearer $token", file, desc)
         service.enqueue(object : Callback<ApiResponse> {
             override fun onResponse(
                 call: Call<ApiResponse>,

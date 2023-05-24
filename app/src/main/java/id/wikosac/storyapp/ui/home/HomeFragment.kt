@@ -2,7 +2,6 @@ package id.wikosac.storyapp.ui.home
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,22 +23,18 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
-        val tokenPref = sharedPreferences.getString("TOKEN", "").toString()
-        homeViewModel.getStory(tokenPref)
-
-        return root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
+        val tokenPref = sharedPreferences.getString("TOKEN", "").toString()
+        homeViewModel.getStory(tokenPref)
         homeViewModel.storyList.observe(viewLifecycleOwner) {
             if (homeViewModel.storyList.value != null) {
-                setItemData(it)
+                setListItem(it)
             }
         }
     }
@@ -49,7 +44,7 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-    private fun setItemData(stories: List<Story>) {
+    private fun setListItem(stories: List<Story>) {
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val itemDecorator = DividerItemDecorator()
         binding.recyclerView.addItemDecoration(itemDecorator)

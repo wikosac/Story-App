@@ -65,18 +65,17 @@ class LoginActivity : AppCompatActivity() {
                 edEmail.error = null
             }
 
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            }
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable) {
                 val email = s.toString()
-                if (!isEmailValid(email)) {
+                if (!validEmail(email)) {
                     edEmail.error = "Invalid email address"
                 } else {
                     edEmail.error = null
                 }
                 if (edPass.text.toString().isNotEmpty() && edPass.error == null) {
-                    setMyButtonEnable()
+                    enableBtn()
                 }
             }
         })
@@ -86,33 +85,32 @@ class LoginActivity : AppCompatActivity() {
                 edPass.error = null
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
                 val pass = s.toString()
-                if (!isPassValid(pass)) {
+                if (!validPass(pass)) {
                     edPass.error = "Password must be greater than or equal to 8"
                 } else {
                     edPass.error = null
                 }
                 if (edEmail.text.toString().isNotEmpty() && edEmail.error == null) {
-                    setMyButtonEnable()
+                    enableBtn()
                 }
             }
         })
     }
 
-    private fun setMyButtonEnable() {
+    private fun enableBtn() {
         binding.btnLogin.isEnabled = edEmail.error == null && edPass.error == null
     }
 
-    private fun isEmailValid(email: String): Boolean {
+    private fun validEmail(email: String): Boolean {
         val pattern = Patterns.EMAIL_ADDRESS
         return pattern.matcher(email).matches()
     }
 
-    private fun isPassValid(pass: String): Boolean {
+    private fun validPass(pass: String): Boolean {
         return pass.length >= 8
     }
 

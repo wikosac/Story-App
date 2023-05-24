@@ -33,7 +33,6 @@ class HomeAdapter(private val listStory: List<Story>) : RecyclerView.Adapter<Hom
             itemView.setOnClickListener {
                 val intent = Intent(itemView.context, DetailActivity::class.java)
                 intent.putExtra("Story", story)
-
                 val optionsCompat: ActivityOptionsCompat =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(
                         itemView.context as Activity,
@@ -41,7 +40,6 @@ class HomeAdapter(private val listStory: List<Story>) : RecyclerView.Adapter<Hom
                         Pair(nameStory, "nameStory"),
                         Pair(descStory, "descStory")
                     )
-
                 itemView.context.startActivity(intent, optionsCompat.toBundle())
             }
         }

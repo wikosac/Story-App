@@ -17,7 +17,7 @@ class HomeViewModel : ViewModel() {
     val storyList: LiveData<List<Story>> = _storyList
 
     fun getStory(token: String) {
-        val client = ApiConfig.getApiService().getAllStories("Bearer $token")
+        val client = ApiConfig.getApiService().stories("Bearer $token")
         client.enqueue(object : Callback<StoryResponse> {
             override fun onResponse(call: Call<StoryResponse>, response: Response<StoryResponse>) {
                 if (response.isSuccessful) {

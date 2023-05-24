@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,11 +46,11 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
             SettingsDialog.Builder(requireActivity()).build().show()
         } else {
-            requestCameraPermission()
+            reqCameraPermission()
         }
     }
 
-    private fun requestCameraPermission() {
+    private fun reqCameraPermission() {
         EasyPermissions.requestPermissions(
             this,
             "This feature requires camera permission",
@@ -74,7 +73,7 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
 
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+    private fun permissionCheck() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(requireActivity().baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
@@ -84,35 +83,30 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentUploadBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
         val tokenPref = sharedPreferences.getString("TOKEN", "").toString()
-
-        if (!allPermissionsGranted()) {
+        if (!permissionCheck()) {
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 REQUIRED_PERMISSIONS,
                 REQUEST_CODE_PERMISSIONS
             )
         }
-
         with(binding) {
             btnCamera.setOnClickListener {
-                if (hasCameraPermission()) {
-                    startTakePhoto()
-                } else {
-                    requestCameraPermission()
-                }
+                if (hasCameraPermission()) openCam() else reqCameraPermission()
             }
-            btnGallery.setOnClickListener { startGallery() }
-            btnUpload.setOnClickListener { uploadImage(tokenPref) }
+            btnGallery.setOnClickListener { openGallery() }
+            btnUpload.setOnClickListener { upImg(tokenPref) }
         }
-
-        return root
     }
 
-    private fun startTakePhoto() {
+    private fun openCam() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         intent.resolveActivity(requireActivity().packageManager)
 
@@ -127,7 +121,7 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         }
     }
 
-    private fun startGallery() {
+    private fun openGallery() {
         val intent = Intent()
         intent.action = Intent.ACTION_GET_CONTENT
         intent.type = "image/*"
@@ -135,7 +129,7 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         launcherIntentGallery.launch(chooser)
     }
 
-    private fun uploadImage(token: String) {
+    private fun upImg(token: String) {
         if (getFile != null) {
             val desc = binding.descView.text.toString()
             if (desc.isBlank()) {
@@ -143,13 +137,13 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
                 return
             }
 
-            val file = reduceFileImage(getFile as File)
+            val file = resizeImg(getFile as File)
             val description = desc.toRequestBody("text/plain".toMediaType())
-            val requestImageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
-            val imageMultipart: MultipartBody.Part =
-                MultipartBody.Part.createFormData("photo", file.name, requestImageFile)
+            val reqImageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+            val imgMultipart: MultipartBody.Part =
+                MultipartBody.Part.createFormData("photo", file.name, reqImageFile)
 
-            viewModel.upload(token, imageMultipart, description)
+            viewModel.upload(token, imgMultipart, description)
             viewModel.message.observe(viewLifecycleOwner) {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
                 if (it.equals("Story created successfully")) {

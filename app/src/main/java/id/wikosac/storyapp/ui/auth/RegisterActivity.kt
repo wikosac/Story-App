@@ -52,8 +52,7 @@ class RegisterActivity : AppCompatActivity() {
                 edEmail.error = null
             }
 
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            }
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable) {
                 val email = s.toString()
@@ -73,8 +72,7 @@ class RegisterActivity : AppCompatActivity() {
                 edPass.error = null
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
                 val pass = s.toString()

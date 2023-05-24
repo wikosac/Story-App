@@ -13,17 +13,11 @@ import androidx.core.content.ContextCompat
 import id.wikosac.storyapp.R
 
 class PassEditText : AppCompatEditText, View.OnTouchListener  {
-    private lateinit var clearButtonImage: Drawable
+    private lateinit var clearFieldImg: Drawable
 
-    constructor(context: Context) : super(context) {
-        init()
-    }
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        init()
-    }
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        init()
-    }
+    constructor(context: Context) : super(context) { init() }
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) { init() }
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init() }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -32,33 +26,29 @@ class PassEditText : AppCompatEditText, View.OnTouchListener  {
     }
 
     private fun init() {
-        clearButtonImage = ContextCompat.getDrawable(context, R.drawable.ic_baseline_close_24) as Drawable
+        clearFieldImg = ContextCompat.getDrawable(context, R.drawable.ic_baseline_close_24) as Drawable
         setOnTouchListener(this)
 
         addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                // Do nothing.
-            }
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (s.toString().isNotEmpty()) showClearButton() else hideClearButton()
+                if (s.toString().isNotEmpty()) clearBtn() else hideClearBtn()
             }
-            override fun afterTextChanged(s: Editable) {
-                // Do nothing.
-            }
+            override fun afterTextChanged(s: Editable) {}
         })
     }
 
-    private fun showClearButton() {
-        setButtonDrawables(endOfTheText = clearButtonImage)
+    private fun clearBtn() {
+        setBtnDrawables(endOfTheText = clearFieldImg)
     }
-    private fun hideClearButton() {
-        setButtonDrawables()
+    private fun hideClearBtn() {
+        setBtnDrawables()
     }
 
-    private fun setButtonDrawables(
+    private fun setBtnDrawables(
         startOfTheText: Drawable? = null,
-        topOfTheText:Drawable? = null,
-        endOfTheText:Drawable? = null,
+        topOfTheText: Drawable? = null,
+        endOfTheText: Drawable? = null,
         bottomOfTheText: Drawable? = null
     ){
         setCompoundDrawablesWithIntrinsicBounds(
@@ -70,33 +60,33 @@ class PassEditText : AppCompatEditText, View.OnTouchListener  {
     }
     override fun onTouch(v: View?, event: MotionEvent): Boolean {
         if (compoundDrawables[2] != null) {
-            val clearButtonStart: Float
-            val clearButtonEnd: Float
-            var isClearButtonClicked = false
+            val clearBtnStart: Float
+            val clearBtnEnd: Float
+            var isClearBtnClicked = false
             if (layoutDirection == View.LAYOUT_DIRECTION_RTL) {
-                clearButtonEnd = (clearButtonImage.intrinsicWidth + paddingStart).toFloat()
+                clearBtnEnd = (clearFieldImg.intrinsicWidth + paddingStart).toFloat()
                 when {
-                    event.x < clearButtonEnd -> isClearButtonClicked = true
+                    event.x < clearBtnEnd -> isClearBtnClicked = true
                 }
             } else {
-                clearButtonStart = (width - paddingEnd - clearButtonImage.intrinsicWidth).toFloat()
+                clearBtnStart = (width - paddingEnd - clearFieldImg.intrinsicWidth).toFloat()
                 when {
-                    event.x > clearButtonStart -> isClearButtonClicked = true
+                    event.x > clearBtnStart -> isClearBtnClicked = true
                 }
             }
-            if (isClearButtonClicked) {
+            if (isClearBtnClicked) {
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        clearButtonImage = ContextCompat.getDrawable(context, R.drawable.ic_baseline_close_24) as Drawable
-                        showClearButton()
+                        clearFieldImg = ContextCompat.getDrawable(context, R.drawable.ic_baseline_close_24) as Drawable
+                        clearBtn()
                         return true
                     }
                     MotionEvent.ACTION_UP -> {
-                        clearButtonImage = ContextCompat.getDrawable(context, R.drawable.ic_baseline_close_24) as Drawable
+                        clearFieldImg = ContextCompat.getDrawable(context, R.drawable.ic_baseline_close_24) as Drawable
                         when {
                             text != null -> text?.clear()
                         }
-                        hideClearButton()
+                        hideClearBtn()
                         return true
                     }
                     else -> return false
