@@ -39,11 +39,12 @@ class HomeFragment : Fragment() {
         )
 
         val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
-        val tokenPref = sharedPreferences.getString("TOKEN", "")
-        homeViewModel.getStory(tokenPref!!)
+        val tokenPref = sharedPreferences.getString("TOKEN", "").toString()
+        Log.d("Login", "onCreate: token -> $tokenPref")
+        homeViewModel.getStory(tokenPref)
 
         homeViewModel.storyList.observe(viewLifecycleOwner) {
-            Log.d(MainActivity.TAG, "onCreateView: ${homeViewModel.storyList.value}")
+            Log.d("Login", "onCreateView: ${homeViewModel.storyList.value}")
             if (homeViewModel.storyList.value != null) {
                 setItemData(it)
             }

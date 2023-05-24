@@ -1,19 +1,17 @@
-package id.wikosac.storyapp.ui.dashboard
+package id.wikosac.storyapp.ui.upload
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import id.wikosac.storyapp.api.ApiConfig
-import id.wikosac.storyapp.api.LoginResponse
 import id.wikosac.storyapp.api.Story
 import id.wikosac.storyapp.api.StoryResponse
-import id.wikosac.storyapp.ui.auth.LoginViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DashboardViewModel : ViewModel() {
+class UploadViewModel : ViewModel() {
 
     private val _storyList = MutableLiveData<List<Story>>()
     val storyList: LiveData<List<Story>> = _storyList

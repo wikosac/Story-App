@@ -7,8 +7,9 @@ import retrofit2.http.*
 
 interface ApiService {
     @Multipart
-    @POST("stories/guest")
+    @POST("stories")
     fun uploadImage(
+        @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
         @Part("description") description: RequestBody,
     ): Call<ApiResponse>
