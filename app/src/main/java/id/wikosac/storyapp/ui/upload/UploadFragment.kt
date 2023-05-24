@@ -91,11 +91,6 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (!allPermissionsGranted()) {
-                Toast.makeText(requireContext(), "Tidak mendapatkan permission.", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

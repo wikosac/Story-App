@@ -39,13 +39,6 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val itemDecorator = DividerItemDecorator()
-        binding.recyclerView.addItemDecoration(
-            itemDecorator
-//            DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
-        )
-
         val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
         val tokenPref = sharedPreferences.getString("TOKEN", "").toString()
         Log.d("Login", "onCreate: token -> $tokenPref")
@@ -67,35 +60,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun setItemData(stories: List<Story>) {
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val itemDecorator = DividerItemDecorator()
+        binding.recyclerView.addItemDecoration(itemDecorator)
         val adapter = HomeAdapter(stories)
         binding.recyclerView.adapter = adapter
-        adapter.setOnItemClickCallback(object : HomeAdapter.OnItemClickCallback {
-            override fun onItemClicked(data: Story) {
-                detail(data.photoUrl, data.name, data.description, data.createdAt)
-//                Toast.makeText(requireContext(), data.name, Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun detail(img: String?, name: String?, desc: String?, time: String?) {
-        val imgStory: ImageView = requireActivity().findViewById(R.id.img_story)
-        val nameStory: TextView = requireActivity().findViewById(R.id.name_story)
-        val descStory: TextView = requireActivity().findViewById(R.id.desc_story)
-
-        val intent = Intent(requireActivity(), DetailActivity::class.java)
-        intent.putExtra("IMG", img)
-        intent.putExtra("NAME", name)
-        intent.putExtra("DESC", desc)
-        intent.putExtra("TIME", time)
-
-        val optionsCompat: ActivityOptionsCompat =
-            ActivityOptionsCompat.makeSceneTransitionAnimation(
-                requireActivity(),
-                Pair(imgStory, "imgStory"),
-                Pair(nameStory, "nameStory"),
-                Pair(descStory, "descStory")
-            )
-        startActivity(intent, optionsCompat.toBundle())
-        Log.d("anim", "detail: ${optionsCompat.toBundle().toString()}")
     }
 }

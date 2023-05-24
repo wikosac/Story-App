@@ -1,7 +1,10 @@
 package id.wikosac.storyapp.api
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Story(
 
 	@field:SerializedName("photoUrl")
@@ -17,11 +20,11 @@ data class Story(
 	val description: String? = null,
 
 	@field:SerializedName("lon")
-	val lon: Any? = null,
+	val lon: String? = null,
 
 	@field:SerializedName("id")
 	val id: String? = null,
 
 	@field:SerializedName("lat")
-	val lat: Any? = null
-)
+	val lat: String? = null
+) : Parcelable
