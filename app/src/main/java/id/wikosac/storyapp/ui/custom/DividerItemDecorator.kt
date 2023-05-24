@@ -11,6 +11,6 @@ class DividerItemDecorator : RecyclerView.ItemDecoration() {
         parent: RecyclerView,
         state: RecyclerView.State
     ) {
-        outRect.setEmpty() // Set the item offsets to zero
+        outRect.setEmpty()
     }
 }

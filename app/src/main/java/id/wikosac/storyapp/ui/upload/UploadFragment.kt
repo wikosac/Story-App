@@ -24,6 +24,8 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import com.vmadalin.easypermissions.EasyPermissions
+import com.vmadalin.easypermissions.dialogs.SettingsDialog
 import id.wikosac.storyapp.MainActivity
 import id.wikosac.storyapp.R
 import id.wikosac.storyapp.api.ApiConfig
@@ -41,7 +43,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 
-class UploadFragment : Fragment() {
+class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     private var _binding: FragmentUploadBinding? = null
     private val binding get() = _binding!!
@@ -54,6 +56,33 @@ class UploadFragment : Fragment() {
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
 
+    private fun hasCameraPermission() =
+        EasyPermissions.hasPermissions(
+            requireContext(),
+            Manifest.permission.CAMERA
+        )
+
+    override fun onPermissionsDenied(requestCode: Int, perms: List<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            SettingsDialog.Builder(requireActivity()).build().show()
+        } else {
+            requestCameraPermission()
+        }
+    }
+
+    private fun requestCameraPermission() {
+        EasyPermissions.requestPermissions(
+            this,
+            "Fitur ini memerlukan izin kamera",
+            REQUEST_CODE_PERMISSIONS,
+            Manifest.permission.CAMERA
+        )
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: List<String>) {
+        Toast.makeText(requireContext(), "Izin diberikan!", Toast.LENGTH_SHORT).show()
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -61,14 +90,10 @@ class UploadFragment : Fragment() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (!allPermissionsGranted()) {
-                Toast.makeText(
-                    requireContext(),
-                    "Tidak mendapatkan permission.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                requireActivity().finish()
+                Toast.makeText(requireContext(), "Tidak mendapatkan permission.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -97,7 +122,13 @@ class UploadFragment : Fragment() {
         }
 
         with(binding) {
-            btnCamera.setOnClickListener { startTakePhoto() }
+            btnCamera.setOnClickListener {
+                if (hasCameraPermission()) {
+                    startTakePhoto()
+                } else {
+                    requestCameraPermission()
+                }
+            }
             btnGallery.setOnClickListener { startGallery() }
             btnUpload.setOnClickListener { uploadImage(tokenPref) }
         }
