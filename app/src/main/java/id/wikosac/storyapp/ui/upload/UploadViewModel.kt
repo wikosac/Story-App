@@ -17,10 +17,6 @@ class UploadViewModel : ViewModel() {
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
 
-    companion object{
-        private const val TAG = "upload"
-    }
-
     fun upload(token: String, file: MultipartBody.Part, desc: RequestBody) {
         val service = ApiConfig.getApiService().uploadImage("Bearer $token", file, desc)
         service.enqueue(object : Callback<ApiResponse> {
@@ -36,7 +32,6 @@ class UploadViewModel : ViewModel() {
                 } else {
                     _message.value = response.message()
                 }
-                Log.d(TAG, "onResponse: ${response.body()}")
             }
             override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
                 _message.value = t.message.toString()

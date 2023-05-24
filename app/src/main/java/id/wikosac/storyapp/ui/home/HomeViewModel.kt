@@ -16,10 +16,6 @@ class HomeViewModel : ViewModel() {
     private val _storyList = MutableLiveData<List<Story>>()
     val storyList: LiveData<List<Story>> = _storyList
 
-    companion object{
-        private const val TAG = "HomeViewModel"
-    }
-
     fun getStory(token: String) {
         val client = ApiConfig.getApiService().getAllStories("Bearer $token")
         client.enqueue(object : Callback<StoryResponse> {
@@ -35,5 +31,9 @@ class HomeViewModel : ViewModel() {
                 Log.e(TAG, "onFailuree: ${t.message.toString()}")
             }
         })
+    }
+
+    companion object{
+        private const val TAG = "HomeViewModel"
     }
 }

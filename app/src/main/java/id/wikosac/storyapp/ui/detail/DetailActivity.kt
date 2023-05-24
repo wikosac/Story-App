@@ -2,13 +2,11 @@ package id.wikosac.storyapp.ui.detail
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import id.wikosac.storyapp.R
 import id.wikosac.storyapp.api.Story
 import id.wikosac.storyapp.databinding.ActivityDetailBinding
-import id.wikosac.storyapp.databinding.ActivityMainBinding
 
 @Suppress("DEPRECATION")
 class DetailActivity : AppCompatActivity() {

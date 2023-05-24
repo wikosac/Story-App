@@ -6,41 +6,29 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.vmadalin.easypermissions.EasyPermissions
 import com.vmadalin.easypermissions.dialogs.SettingsDialog
 import id.wikosac.storyapp.MainActivity
-import id.wikosac.storyapp.R
-import id.wikosac.storyapp.api.ApiConfig
-import id.wikosac.storyapp.api.ApiResponse
 import id.wikosac.storyapp.databinding.FragmentUploadBinding
-import id.wikosac.storyapp.ui.detail.DetailActivity
-import id.wikosac.storyapp.ui.home.HomeFragment
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.File
 
 class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
@@ -49,18 +37,11 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private val binding get() = _binding!!
     private var getFile: File? = null
     private val viewModel : UploadViewModel by viewModels()
+    private lateinit var currentPhotoPath: String
 
-    companion object {
-        const val TAG = "image"
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-        private const val REQUEST_CODE_PERMISSIONS = 10
-    }
 
     private fun hasCameraPermission() =
-        EasyPermissions.hasPermissions(
-            requireContext(),
-            Manifest.permission.CAMERA
-        )
+        EasyPermissions.hasPermissions(requireContext(), Manifest.permission.CAMERA)
 
     override fun onPermissionsDenied(requestCode: Int, perms: List<String>) {
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
@@ -73,14 +54,14 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private fun requestCameraPermission() {
         EasyPermissions.requestPermissions(
             this,
-            "Fitur ini memerlukan izin kamera",
+            "This feature requires camera permission",
             REQUEST_CODE_PERMISSIONS,
             Manifest.permission.CAMERA
         )
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: List<String>) {
-        Toast.makeText(requireContext(), "Izin diberikan!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Permission granted!", Toast.LENGTH_SHORT).show()
     }
 
     @Deprecated("Deprecated in Java")
@@ -136,11 +117,10 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         intent.resolveActivity(requireActivity().packageManager)
 
         createCustomTempFile(requireActivity().application).also {
-            val photoURI: Uri = FileProvider.getUriForFile(
-                requireActivity(),
-                "id.wikosac.storyapp.ui.upload",
-                it
-            )
+            val photoURI: Uri =
+                FileProvider.getUriForFile(
+                    requireActivity(), "id.wikosac.storyapp.ui.upload", it
+                )
             currentPhotoPath = it.absolutePath
             intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
             launcherIntentCamera.launch(intent)
@@ -156,28 +136,20 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     }
 
     private fun uploadImage(token: String) {
-        val desc = binding.descView.text.toString()
-        Log.d("up", "desc: $desc")
-
-
         if (getFile != null) {
+            val desc = binding.descView.text.toString()
             if (desc.isBlank()) {
                 Toast.makeText(requireContext(), "Please fill in the description", Toast.LENGTH_SHORT).show()
                 return
             }
 
             val file = reduceFileImage(getFile as File)
-
             val description = desc.toRequestBody("text/plain".toMediaType())
             val requestImageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
-            val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
-                "photo",
-                file.name,
-                requestImageFile
-            )
+            val imageMultipart: MultipartBody.Part =
+                MultipartBody.Part.createFormData("photo", file.name, requestImageFile)
 
             viewModel.upload(token, imageMultipart, description)
-
             viewModel.message.observe(viewLifecycleOwner) {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
                 if (it.equals("Story created successfully")) {
@@ -185,22 +157,19 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
                     startActivity(intent)
                 }
             }
-
         } else {
             Toast.makeText(requireContext(), "Please insert an image file first", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private lateinit var currentPhotoPath: String
     private val launcherIntentCamera = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == AppCompatActivity.RESULT_OK) {
-            val myFile = File(currentPhotoPath)
-
-            myFile.let { file ->
-                rotateFile(file)
+            val imgTaken = File(currentPhotoPath)
+            imgTaken.let { file ->
                 getFile = file
+                rotateFile(file)
                 binding.previewImageView.setImageBitmap(BitmapFactory.decodeFile(file.path))
             }
         }
@@ -208,13 +177,13 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     private val launcherIntentGallery = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == AppCompatActivity.RESULT_OK) {
-            val selectedImg = result.data?.data as Uri
-            selectedImg.let { uri ->
+    ) {
+        if (it.resultCode == AppCompatActivity.RESULT_OK) {
+            val myImgFile = it.data?.data as Uri
+            myImgFile.let { uri ->
                 val myFile = uriToFile(uri, requireContext())
-                rotateFile(myFile)
                 getFile = myFile
+                rotateFile(myFile)
                 binding.previewImageView.setImageURI(uri)
             }
         }
@@ -223,5 +192,10 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private const val REQUEST_CODE_PERMISSIONS = 10
     }
 }

@@ -11,14 +11,11 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import id.wikosac.storyapp.R
 import id.wikosac.storyapp.api.Story
 import id.wikosac.storyapp.ui.detail.DetailActivity
 
-class HomeAdapter(
-    private val listStory: List<Story>
-) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
+class HomeAdapter(private val listStory: List<Story>) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val imgStory: ImageView = view.findViewById(R.id.img_story)
@@ -44,6 +41,7 @@ class HomeAdapter(
                         Pair(nameStory, "nameStory"),
                         Pair(descStory, "descStory")
                     )
+
                 itemView.context.startActivity(intent, optionsCompat.toBundle())
             }
         }
@@ -56,5 +54,5 @@ class HomeAdapter(
         holder.bind(listStory[position])
     }
 
-    override fun getItemCount(): Int = listStory.size
+    override fun getItemCount() = listStory.size
 }

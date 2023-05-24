@@ -10,8 +10,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import id.wikosac.storyapp.MainActivity
 import id.wikosac.storyapp.databinding.FragmentSettingsBinding
 import id.wikosac.storyapp.ui.auth.LoginActivity
 
@@ -25,8 +23,6 @@ class SettingsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val settingsViewModel =
-            ViewModelProvider(this).get(SettingsViewModel::class.java)
 
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -37,10 +33,7 @@ class SettingsFragment : Fragment() {
         val textView: TextView = binding.textView
         textView.text = name
 
-        binding.logout.setOnClickListener {
-            showLogoutConfirmationDialog()
-            clearLoginSession()
-        }
+        binding.logout.setOnClickListener { showLogoutConfirmationDialog() }
 
         return root
     }
@@ -50,31 +43,30 @@ class SettingsFragment : Fragment() {
         _binding = null
     }
 
-    private fun clearLoginSession() {
-        val sharedPreferences = requireContext().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.remove("TOKEN")
-        editor.apply()
-    }
-
-    fun showLogoutConfirmationDialog() {
+    private fun showLogoutConfirmationDialog() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Logout")
-        builder.setMessage("Apakah Anda yakin ingin logout?")
-        builder.setPositiveButton("Ya") { _, _ ->
-            performLogout()
-        }
-        builder.setNegativeButton("Tidak", null)
+        builder.setMessage("Are you sure you want to logout?")
+        builder.setPositiveButton("Yes") { _, _ -> performLogout() }
+        builder.setNegativeButton("No", null)
         val dialog = builder.create()
         dialog.show()
     }
 
     private fun performLogout() {
-        Toast.makeText(requireContext(), "Logged Out", Toast.LENGTH_SHORT).show()
         val intent = Intent(requireActivity(), LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         requireActivity().finish()
+        clearLoginSession()
+        Toast.makeText(requireContext(), "Logged Out", Toast.LENGTH_SHORT).show()
     }
 
+    private fun clearLoginSession() {
+        val sharedPreferences = requireContext().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.remove("TOKEN")
+        editor.remove("NAME")
+        editor.apply()
+    }
 }

@@ -8,45 +8,52 @@
 
     <TextView
         android:id="@+id/text_view"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="388dp"
+        android:text="Setting"
         android:textAlignment="center"
         android:textSize="20sp"
-        android:text="Setting"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="@+id/imageView" />
 
     <RelativeLayout
         android:id="@+id/logout"
-        android:layout_marginTop="1dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginBottom="128dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_marginTop="64dp"
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/text_view">
 
         <ImageView
-            android:layout_width="40dp"
             android:id="@+id/aboutUsIcon"
+            android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_baseline_exit_to_app_24"
-            android:padding="12dp"/>
+            android:padding="12dp"
+            android:src="@drawable/ic_baseline_exit_to_app_24" />
 
         <TextView
-            android:layout_marginStart="15dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            android:layout_toEndOf="@+id/aboutUsIcon"
             android:text="@string/logout"
-            android:textStyle="bold"
-            android:layout_toEndOf="@+id/aboutUsIcon" />
+            android:textStyle="bold" />
     </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/ic_baseline_account_circle_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/text_view"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
