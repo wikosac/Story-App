@@ -177,7 +177,6 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             myImgFile.let { uri ->
                 val myFile = uriToFile(uri, requireContext())
                 getFile = myFile
-                rotateFile(myFile)
                 binding.previewImageView.setImageURI(uri)
             }
         }

@@ -47,57 +47,36 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        edEmail.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                edEmail.error = null
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable) {
-                val email = s.toString()
-                if (!isEmailValid(email)) {
-                    edEmail.error = "Invalid email address"
-                } else {
-                    edEmail.error = null
-                }
-                if (edPass.text.toString().isNotEmpty() && edPass.error == null) {
-                    setMyButtonEnable()
-                }
-            }
-        })
-
-        edPass.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        edEmail.setValidationListener(object : EmailEditText.ValidationListener {
+            override fun onValidationSuccess() {
                 edPass.error = null
+                if (edPass.text.toString().isNotEmpty() && edPass.error == null) {
+                    enableBtn()
+                }
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun onValidationFailure() {
+                edPass.error = "Invalid email address"
+            }
 
-            override fun afterTextChanged(s: Editable?) {
-                val pass = s.toString()
-                if (!isPassValid(pass)) {
-                    edPass.error = "Password must be greater than or equal to 8"
-                } else {
-                    edPass.error = null
-                }
+        })
+
+        edPass.setValidationListener(object : PassEditText.ValidationListener {
+            override fun onValidationSuccess() {
+                edPass.error = null
                 if (edEmail.text.toString().isNotEmpty() && edEmail.error == null) {
-                    setMyButtonEnable()
+                    enableBtn()
                 }
             }
+
+            override fun onValidationFailure() {
+                edPass.error = "Password must be greater than or equal to 8"
+            }
+
         })
     }
 
-    private fun setMyButtonEnable() {
+    private fun enableBtn() {
         binding.btnRegister.isEnabled = edEmail.error == null && edPass.error == null
-    }
-
-    private fun isEmailValid(email: String): Boolean {
-        val pattern = Patterns.EMAIL_ADDRESS
-        return pattern.matcher(email).matches()
-    }
-
-    private fun isPassValid(pass: String): Boolean {
-        return pass.length >= 8
     }
 }

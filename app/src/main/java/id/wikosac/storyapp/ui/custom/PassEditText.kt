@@ -14,6 +14,7 @@ import id.wikosac.storyapp.R
 
 class PassEditText : AppCompatEditText, View.OnTouchListener  {
     private lateinit var clearFieldImg: Drawable
+    private var validationListener: ValidationListener? = null
 
     constructor(context: Context) : super(context) { init() }
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) { init() }
@@ -31,10 +32,20 @@ class PassEditText : AppCompatEditText, View.OnTouchListener  {
 
         addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 if (s.toString().isNotEmpty()) clearBtn() else hideClearBtn()
             }
-            override fun afterTextChanged(s: Editable) {}
+
+            override fun afterTextChanged(s: Editable) {
+                validationListener?.let {
+                    if (validPass(s.toString())) {
+                        it.onValidationSuccess()
+                    } else {
+                        it.onValidationFailure()
+                    }
+                }
+            }
         })
     }
 
@@ -94,5 +105,18 @@ class PassEditText : AppCompatEditText, View.OnTouchListener  {
             } else return false
         }
         return false
+    }
+
+    fun setValidationListener(listener: ValidationListener?) {
+        validationListener = listener
+    }
+
+    private fun validPass(pass: String): Boolean {
+        return pass.length >= 8
+    }
+
+    interface ValidationListener {
+        fun onValidationSuccess()
+        fun onValidationFailure()
     }
 }

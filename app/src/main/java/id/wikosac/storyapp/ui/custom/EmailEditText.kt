@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
+import android.util.Patterns
 import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.widget.AppCompatEditText
@@ -14,6 +15,7 @@ import id.wikosac.storyapp.R
 
 class EmailEditText : AppCompatEditText, View.OnTouchListener  {
     private lateinit var clearFieldImg: Drawable
+    private var validationListener: ValidationListener? = null
 
     constructor(context: Context) : super(context) { init() }
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) { init() }
@@ -31,10 +33,20 @@ class EmailEditText : AppCompatEditText, View.OnTouchListener  {
 
         addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 if (s.toString().isNotEmpty()) clearBtn() else hideClearBtn()
             }
-            override fun afterTextChanged(s: Editable) {}
+
+            override fun afterTextChanged(s: Editable) {
+                validationListener?.let {
+                    if (validEmail(s.toString())) {
+                        it.onValidationSuccess()
+                    } else {
+                        it.onValidationFailure()
+                    }
+                }
+            }
         })
     }
 
@@ -94,5 +106,19 @@ class EmailEditText : AppCompatEditText, View.OnTouchListener  {
             } else return false
         }
         return false
+    }
+
+    fun setValidationListener(listener: ValidationListener?) {
+        validationListener = listener
+    }
+
+    private fun validEmail(email: String): Boolean {
+        val pattern = Patterns.EMAIL_ADDRESS
+        return pattern.matcher(email).matches()
+    }
+
+    interface ValidationListener {
+        fun onValidationSuccess()
+        fun onValidationFailure()
     }
 }
