@@ -9,4 +9,6 @@
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
     <string name="register">Register</string>
+    <string name="title_maps">Maps</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>

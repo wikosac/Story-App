@@ -62,14 +62,11 @@ class LoginActivity : AppCompatActivity() {
 
         edEmail.setValidationListener(object : EmailEditText.ValidationListener {
             override fun onValidationSuccess() {
-                edPass.error = null
-                if (edPass.text.toString().isNotEmpty() && edPass.error == null) {
-                    enableBtn()
-                }
+                edEmail.error = null
             }
 
             override fun onValidationFailure() {
-                edPass.error = "Invalid email address"
+                edEmail.error = "Invalid email address"
             }
 
         })
@@ -77,9 +74,6 @@ class LoginActivity : AppCompatActivity() {
         edPass.setValidationListener(object : PassEditText.ValidationListener {
             override fun onValidationSuccess() {
                 edPass.error = null
-                if (edEmail.text.toString().isNotEmpty() && edEmail.error == null) {
-                    enableBtn()
-                }
             }
 
             override fun onValidationFailure() {
@@ -87,10 +81,40 @@ class LoginActivity : AppCompatActivity() {
             }
 
         })
+
+        edEmail.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                enableBtn()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                if (edPass.toString().isNotEmpty() && edPass.error == null) {
+                    enableBtn()
+                }
+            }
+
+        })
+
+        edPass.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                enableBtn()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                if (edEmail.toString().isNotEmpty() && edEmail.error == null) {
+                    enableBtn()
+                }
+            }
+
+        })
     }
 
     private fun enableBtn() {
-        binding.btnLogin.isEnabled = edEmail.error == null && edPass.error == null
+        binding.btnLogin.isEnabled = (edEmail.toString().isNotEmpty() && edEmail.error == null) && (edPass.toString().isNotEmpty() && edPass.error == null)
     }
 
     private fun saveLoginSession(context: Context, token: String, name: String) {
