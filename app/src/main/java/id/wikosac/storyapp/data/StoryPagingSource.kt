@@ -12,8 +12,6 @@ import retrofit2.Response
 
 class StoryPagingSource(private val apiService: ApiService) : PagingSource<Int, Story>() {
 
-    var listStory: List<Story> = listOf()
-
     private companion object {
         const val INITIAL_PAGE_INDEX = 1
     }
@@ -21,28 +19,12 @@ class StoryPagingSource(private val apiService: ApiService) : PagingSource<Int, 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Story> {
         return try {
             val page = params.key ?: INITIAL_PAGE_INDEX
-            val responseData = apiService.getStory(page, params.loadSize)
-            responseData.enqueue(object : Callback<StoryResponse> {
-                override fun onResponse(
-                    call: Call<StoryResponse>,
-                    response: Response<StoryResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        listStory = response.body()!!.listStory
-                        Log.d("storyzz", "load: $listStory")
-                    } else {
-                        Log.d("storyzz", "loadd: ${response.message()}")
-                    }
-                }
-                override fun onFailure(call: Call<StoryResponse>, t: Throwable) {
-                    Log.e("storyzz", "loade: ${t.message.toString()}")
-                }
-            })
+            val responseData = apiService.getStoryPaged(page, params.loadSize)
 
             LoadResult.Page(
-                data = listStory,
+                data = responseData.listStory,
                 prevKey = if (page == 1) null else page - 1,
-                nextKey = if (listStory.isEmpty()) null else page + 1
+                nextKey = if (responseData.listStory.isEmpty()) null else page + 1
             )
         } catch (exception: Exception) {
             Log.e("storyzz", "loadee: $exception")

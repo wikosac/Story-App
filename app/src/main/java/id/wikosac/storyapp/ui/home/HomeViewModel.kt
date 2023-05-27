@@ -16,26 +16,7 @@ import retrofit2.Response
 
 class HomeViewModel(storyRepository: StoryRepository) : ViewModel() {
 
-    val story: LiveData<PagingData<Story>> = storyRepository.getStory().cachedIn(viewModelScope)
-    private val _storyList = MutableLiveData<List<Story>>()
-    val storyList: LiveData<List<Story>> = _storyList
-
-    fun getStory() {
-        val client = ApiConfig.getApiService().getStory(1, 5)
-        client.enqueue(object : Callback<StoryResponse> {
-            override fun onResponse(call: Call<StoryResponse>, response: Response<StoryResponse>) {
-                if (response.isSuccessful) {
-                    _storyList.value = response.body()?.listStory
-                    Log.d(TAG, "onResponse: ${_storyList.value}")
-                } else {
-                    Log.e(TAG, "onFailurei: ${response.message()}")
-                }
-            }
-            override fun onFailure(call: Call<StoryResponse>, t: Throwable) {
-                Log.e(TAG, "onFailuree: ${t.message.toString()}")
-            }
-        })
-    }
+    val story: LiveData<PagingData<Story>> = storyRepository.getPagedStory().cachedIn(viewModelScope)
 
     companion object{
         private const val TAG = "HomeViewModel"

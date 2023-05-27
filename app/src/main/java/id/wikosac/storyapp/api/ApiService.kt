@@ -1,6 +1,5 @@
 package id.wikosac.storyapp.api
 
-import id.wikosac.storyapp.ui.auth.LoginActivity
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -30,17 +29,14 @@ interface ApiService {
         @Part("description") description: RequestBody
     ): Call<ApiResponse>
 
-//    @GET("stories")
-//    fun stories(): Call<StoryResponse>
-
     @GET("stories")
     fun storiesLocation(
         @Query("location") location: Int
     ): Call<StoryResponse>
 
     @GET("stories")
-    fun getStory(
+    suspend fun getStoryPaged(
         @Query("page") page: Int,
         @Query("size") size: Int
-    ): Call<StoryResponse>
+    ): StoryResponse
 }

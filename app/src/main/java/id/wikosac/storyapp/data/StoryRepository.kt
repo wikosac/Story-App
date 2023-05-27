@@ -14,7 +14,7 @@ class StoryRepository(
     private val apiService: ApiService
     ) {
 
-    fun getStory(): LiveData<PagingData<Story>> {
+    fun getPagedStory(): LiveData<PagingData<Story>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 5

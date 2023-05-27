@@ -28,16 +28,11 @@ class HomeAdapter()
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 //        holder.bind(listStory[position])
         val data = getItem(position)
-//        if (data != null) {
-//            holder.bind(data)
-//        }
-        data?.let {
-            holder.bind(it)
+        if (data != null) {
+            holder.bind(data)
         }
         Log.d("testo", "onBindViewHolder: $data")
     }
-
-//    override fun getItemCount() = listStory.size
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val imgStory: ImageView = view.findViewById(R.id.img_story)

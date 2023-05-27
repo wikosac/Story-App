@@ -35,10 +35,9 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeViewModel.getStory()
-            setListItem()
-        homeViewModel.storyList.observe(viewLifecycleOwner) {
-        }
+
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        setListItem()
     }
 
     override fun onDestroyView() {
@@ -47,11 +46,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun setListItem() {
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val itemDecorator = DividerItemDecorator()
         binding.recyclerView.addItemDecoration(itemDecorator)
         val adapter = HomeAdapter()
-//        binding.recyclerView.adapter = adapter
         binding.recyclerView.adapter = adapter.withLoadStateFooter(
             footer = LoadingStateAdapter {
                 adapter.retry()
@@ -60,6 +57,5 @@ class HomeFragment : Fragment() {
         homeViewModel.story.observe(viewLifecycleOwner) {
             adapter.submitData(lifecycle, it)
         }
-            Log.d("testo", "setListItem: $adapter")
     }
 }
