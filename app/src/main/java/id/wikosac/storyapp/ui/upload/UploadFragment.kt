@@ -88,8 +88,6 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
-        val tokenPref = sharedPreferences.getString("TOKEN", "").toString()
         if (!permissionCheck()) {
             ActivityCompat.requestPermissions(
                 requireActivity(),
@@ -102,7 +100,7 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
                 if (hasCameraPermission()) openCam() else reqCameraPermission()
             }
             btnGallery.setOnClickListener { openGallery() }
-            btnUpload.setOnClickListener { upImg(tokenPref) }
+            btnUpload.setOnClickListener { upImg() }
         }
     }
 
@@ -129,7 +127,7 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         launcherIntentGallery.launch(chooser)
     }
 
-    private fun upImg(token: String) {
+    private fun upImg() {
         if (getFile != null) {
             val desc = binding.descView.text.toString()
             if (desc.isBlank()) {
@@ -143,7 +141,7 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             val imgMultipart: MultipartBody.Part =
                 MultipartBody.Part.createFormData("photo", file.name, reqImageFile)
 
-            viewModel.upload(token, imgMultipart, description)
+            viewModel.upload(imgMultipart, description)
             viewModel.message.observe(viewLifecycleOwner) {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
                 if (it.equals("Story created successfully")) {
@@ -163,7 +161,6 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             val imgTaken = File(currentPhotoPath)
             imgTaken.let { file ->
                 getFile = file
-                rotateFile(file)
                 binding.previewImageView.setImageBitmap(BitmapFactory.decodeFile(file.path))
             }
         }

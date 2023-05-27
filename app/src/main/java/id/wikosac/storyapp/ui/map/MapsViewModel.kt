@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import id.wikosac.storyapp.api.ApiConfig
 import id.wikosac.storyapp.api.Story
 import id.wikosac.storyapp.api.StoryResponse
+import id.wikosac.storyapp.ui.auth.LoginActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,8 +16,8 @@ class MapsViewModel: ViewModel() {
     private val _storyList = MutableLiveData<List<Story>>()
     val storyList: LiveData<List<Story>> = _storyList
 
-    fun getStoryLocation(token: String) {
-        val client = ApiConfig.getApiService().storiesLocation("Bearer $token", 1)
+    fun getStoryLocation() {
+        val client = ApiConfig.getApiService().storiesLocation(1)
         client.enqueue(object : Callback<StoryResponse> {
             override fun onResponse(call: Call<StoryResponse>, response: Response<StoryResponse>) {
                 if (response.isSuccessful) {

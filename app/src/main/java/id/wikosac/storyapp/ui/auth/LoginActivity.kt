@@ -28,17 +28,18 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val sharedPreferences = getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
-        val tokenPref = sharedPreferences.getString("TOKEN", "")
-        if (tokenPref != "") {
-            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+        val sharedPreferences = getSharedPreferences(SESSION, Context.MODE_PRIVATE)
+        TOKEN_PREF = sharedPreferences.getString(TOKEN, "").toString()
+        NAME_PREF = sharedPreferences.getString(NAME, "").toString()
+        if (TOKEN_PREF != "") {
+            val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             finish()
         }
 
-        edEmail = findViewById(R.id.ed_login_email)
-        edPass = findViewById(R.id.ed_login_password)
+        edEmail = binding.edLoginEmail
+        edPass = binding.edLoginPassword
 
         binding.txtRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
@@ -56,7 +57,7 @@ class LoginActivity : AppCompatActivity() {
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)
                 finish()
-                saveLoginSession(this, it.loginResult.token, it.loginResult.name)
+                saveLoginSession(it.loginResult.token, it.loginResult.name)
             }
         }
 
@@ -117,11 +118,19 @@ class LoginActivity : AppCompatActivity() {
         binding.btnLogin.isEnabled = (edEmail.toString().isNotEmpty() && edEmail.error == null) && (edPass.toString().isNotEmpty() && edPass.error == null)
     }
 
-    private fun saveLoginSession(context: Context, token: String, name: String) {
-        val sharedPref = context.getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
+    private fun saveLoginSession(token: String, name: String) {
+        val sharedPref = getSharedPreferences(SESSION, Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
-        editor.putString("TOKEN", token)
-        editor.putString("NAME", name)
+        editor.putString(TOKEN, token)
+        editor.putString(NAME, name)
         editor.apply()
+    }
+
+    companion object {
+        const val SESSION = "session"
+        const val TOKEN = "token"
+        const val NAME = "name"
+        var TOKEN_PREF = ""
+        var NAME_PREF = ""
     }
 }

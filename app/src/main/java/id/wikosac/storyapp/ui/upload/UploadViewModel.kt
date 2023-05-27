@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import id.wikosac.storyapp.api.*
+import id.wikosac.storyapp.ui.auth.LoginActivity
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -17,8 +18,8 @@ class UploadViewModel : ViewModel() {
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
 
-    fun upload(token: String, file: MultipartBody.Part, desc: RequestBody) {
-        val service = ApiConfig.getApiService().upload("Bearer $token", file, desc)
+    fun upload(file: MultipartBody.Part, desc: RequestBody) {
+        val service = ApiConfig.getApiService().upload(file, desc)
         service.enqueue(object : Callback<ApiResponse> {
             override fun onResponse(
                 call: Call<ApiResponse>,

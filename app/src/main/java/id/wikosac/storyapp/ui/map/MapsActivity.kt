@@ -28,9 +28,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val sharedPreferences = getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
-        val tokenPref = sharedPreferences.getString("TOKEN", "").toString()
-        viewModel.getStoryLocation(tokenPref)
+        viewModel.getStoryLocation()
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager

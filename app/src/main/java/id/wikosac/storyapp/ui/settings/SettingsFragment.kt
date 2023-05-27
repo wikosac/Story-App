@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import id.wikosac.storyapp.MainActivity
 import id.wikosac.storyapp.databinding.FragmentSettingsBinding
 import id.wikosac.storyapp.ui.auth.LoginActivity
 
@@ -29,10 +30,8 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val sharedPreferences = requireActivity().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
-        val name = sharedPreferences.getString("NAME", "").toString()
         val textView: TextView = binding.textView
-        textView.text = name
+        textView.text = LoginActivity.NAME_PREF
         binding.logout.setOnClickListener { confirmLogout() }
     }
 
@@ -61,10 +60,10 @@ class SettingsFragment : Fragment() {
     }
 
     private fun deleteLoginSession() {
-        val sharedPreferences = requireContext().getSharedPreferences("LoginSession", Context.MODE_PRIVATE)
+        val sharedPreferences = requireContext().getSharedPreferences(LoginActivity.SESSION, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.remove("TOKEN")
-        editor.remove("NAME")
+        editor.remove(LoginActivity.TOKEN)
+        editor.remove(LoginActivity.NAME)
         editor.apply()
     }
 }
