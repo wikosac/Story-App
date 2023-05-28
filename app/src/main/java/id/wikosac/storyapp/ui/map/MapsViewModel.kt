@@ -7,14 +7,16 @@ import androidx.lifecycle.ViewModel
 import id.wikosac.storyapp.api.ApiConfig
 import id.wikosac.storyapp.api.Story
 import id.wikosac.storyapp.api.StoryResponse
-import id.wikosac.storyapp.ui.auth.LoginActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class MapsViewModel: ViewModel() {
+
     private val _storyList = MutableLiveData<List<Story>>()
     val storyList: LiveData<List<Story>> = _storyList
+    private val _message = MutableLiveData<String>()
+    val message: LiveData<String> = _message
 
     fun getStoryLocation() {
         val client = ApiConfig.getApiService().storiesLocation(1)
@@ -22,13 +24,13 @@ class MapsViewModel: ViewModel() {
             override fun onResponse(call: Call<StoryResponse>, response: Response<StoryResponse>) {
                 if (response.isSuccessful) {
                     _storyList.value = response.body()?.listStory
-                    Log.d(TAG, "onResponse: ${_storyList.value}")
+                    _message.value = response.body()?.message
                 } else {
-                    Log.e(TAG, "onFailurei: ${response.message()}")
+                    _message.value = response.message()
                 }
             }
             override fun onFailure(call: Call<StoryResponse>, t: Throwable) {
-                Log.e(TAG, "onFailuree: ${t.message.toString()}")
+                _message.value = t.message.toString()
             }
         })
     }

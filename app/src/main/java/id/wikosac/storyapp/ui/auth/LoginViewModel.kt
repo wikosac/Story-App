@@ -1,6 +1,5 @@
 package id.wikosac.storyapp.ui.auth
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,7 +23,6 @@ class LoginViewModel: ViewModel() {
                 if (response.isSuccessful) {
                     _loginInfo.value = response.body()
                     _message.value = _loginInfo.value?.message.toString()
-                    Log.d("regist", "onResponse: ${response.body()}")
                 } else {
                     _message.value = response.message()
                 }

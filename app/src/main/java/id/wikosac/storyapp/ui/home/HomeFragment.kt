@@ -1,28 +1,20 @@
 package id.wikosac.storyapp.ui.home
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import id.wikosac.storyapp.MainActivity
-import id.wikosac.storyapp.api.Story
 import id.wikosac.storyapp.databinding.FragmentHomeBinding
-import id.wikosac.storyapp.ui.auth.LoginActivity
 import id.wikosac.storyapp.ui.custom.DividerItemDecorator
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val homeViewModel: HomeViewModel by viewModels {
-        ViewModelFactory(requireContext())
-    }
+    private val homeViewModel: HomeViewModel by viewModels { ViewModelFactory() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +29,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.addItemDecoration(DividerItemDecorator())
+
         setListItem()
     }
 
@@ -46,15 +40,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun setListItem() {
-        val itemDecorator = DividerItemDecorator()
-        binding.recyclerView.addItemDecoration(itemDecorator)
         val adapter = HomeAdapter()
         binding.recyclerView.adapter = adapter.withLoadStateFooter(
-            footer = LoadingStateAdapter {
+            footer = LoadingAdapter {
                 adapter.retry()
             }
         )
-        homeViewModel.story.observe(viewLifecycleOwner) {
+        homeViewModel.storyPaged().observe(viewLifecycleOwner) {
             adapter.submitData(lifecycle, it)
         }
     }

@@ -1,12 +1,9 @@
 package id.wikosac.storyapp.ui.upload
 
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import id.wikosac.storyapp.api.*
-import id.wikosac.storyapp.ui.auth.LoginActivity
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call

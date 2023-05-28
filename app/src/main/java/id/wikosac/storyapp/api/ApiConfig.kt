@@ -1,13 +1,10 @@
 package id.wikosac.storyapp.api
 
-import com.google.gson.GsonBuilder
 import id.wikosac.storyapp.BuildConfig
-import id.wikosac.storyapp.MainActivity
 import id.wikosac.storyapp.ui.auth.LoginActivity
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -21,10 +18,10 @@ class ApiConfig {
             }
             val authInterceptor = Interceptor { chain ->
                 val req = chain.request()
-                val requestHeaders = req.newBuilder()
+                val reqHeaders = req.newBuilder()
                     .addHeader("Authorization", "Bearer ${LoginActivity.TOKEN_PREF}")
                     .build()
-                chain.proceed(requestHeaders)
+                chain.proceed(reqHeaders)
             }
             val client = OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)

@@ -2,16 +2,14 @@ package id.wikosac.storyapp.ui.auth
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.viewModels
 import id.wikosac.storyapp.MainActivity
-import id.wikosac.storyapp.R
 import id.wikosac.storyapp.databinding.ActivityLoginBinding
 import id.wikosac.storyapp.ui.custom.EmailEditText
 import id.wikosac.storyapp.ui.custom.PassEditText
@@ -21,6 +19,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var edEmail: EmailEditText
     private lateinit var edPass: PassEditText
+    private lateinit var sharedPref: SharedPreferences
     private val loginViewModel by viewModels<LoginViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,9 +27,9 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val sharedPreferences = getSharedPreferences(SESSION, Context.MODE_PRIVATE)
-        TOKEN_PREF = sharedPreferences.getString(TOKEN, "").toString()
-        NAME_PREF = sharedPreferences.getString(NAME, "").toString()
+        sharedPref = getSharedPreferences(SESSION, Context.MODE_PRIVATE)
+        TOKEN_PREF = sharedPref.getString(TOKEN, "").toString()
+        NAME_PREF = sharedPref.getString(NAME, "").toString()
         if (TOKEN_PREF != "") {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -53,11 +52,13 @@ class LoginActivity : AppCompatActivity() {
         }
         loginViewModel.loginInfo.observe(this) {
             if (it.message == "success") {
+                saveLoginSession(this, it.loginResult.token, it.loginResult.name)
+                TOKEN_PREF = sharedPref.getString(TOKEN, "").toString()
+                NAME_PREF = sharedPref.getString(NAME, "").toString()
                 val intent = Intent(this, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)
                 finish()
-                saveLoginSession(it.loginResult.token, it.loginResult.name)
             }
         }
 
@@ -71,7 +72,6 @@ class LoginActivity : AppCompatActivity() {
             }
 
         })
-
         edPass.setValidationListener(object : PassEditText.ValidationListener {
             override fun onValidationSuccess() {
                 edPass.error = null
@@ -82,7 +82,6 @@ class LoginActivity : AppCompatActivity() {
             }
 
         })
-
         edEmail.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -97,7 +96,6 @@ class LoginActivity : AppCompatActivity() {
             }
 
         })
-
         edPass.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -118,8 +116,8 @@ class LoginActivity : AppCompatActivity() {
         binding.btnLogin.isEnabled = (edEmail.toString().isNotEmpty() && edEmail.error == null) && (edPass.toString().isNotEmpty() && edPass.error == null)
     }
 
-    private fun saveLoginSession(token: String, name: String) {
-        val sharedPref = getSharedPreferences(SESSION, Context.MODE_PRIVATE)
+    private fun saveLoginSession(context: Context, token: String, name: String) {
+        val sharedPref = context.getSharedPreferences(SESSION, Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
         editor.putString(TOKEN, token)
         editor.putString(NAME, name)

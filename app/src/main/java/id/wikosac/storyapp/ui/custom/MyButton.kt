@@ -4,9 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.Patterns
 import android.view.Gravity
-import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import id.wikosac.storyapp.R

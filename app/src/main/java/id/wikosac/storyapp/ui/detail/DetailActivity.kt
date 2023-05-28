@@ -19,11 +19,10 @@ class DetailActivity : AppCompatActivity() {
 
         val story = intent.getParcelableExtra<Story>("Story") as Story
 
-        with(binding) {
+        with (binding) {
             Glide.with(imgStory.context)
                 .load(story.photoUrl)
                 .apply(RequestOptions.placeholderOf(R.mipmap.ic_launcher).override(200,200))
-                .error(R.drawable.ic_baseline_broken_image_24)
                 .into(imgStory)
             nameStory.text = story.name
             descStory.text = story.description

@@ -9,27 +9,19 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(tableName = "story")
 data class Story(
-
 	@PrimaryKey
 	@field:SerializedName("id")
 	val id: String,
-
 	@field:SerializedName("photoUrl")
 	val photoUrl: String,
-
 	@field:SerializedName("createdAt")
 	val createdAt: String,
-
 	@field:SerializedName("name")
 	val name: String,
-
 	@field:SerializedName("description")
 	val description: String,
-
 	@field:SerializedName("lon")
 	val lon: String? = null,
-
 	@field:SerializedName("lat")
 	val lat: String? = null
-
 ) : Parcelable

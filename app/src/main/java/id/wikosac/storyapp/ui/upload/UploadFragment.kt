@@ -1,7 +1,6 @@
 package id.wikosac.storyapp.ui.upload
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
@@ -38,7 +37,6 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private val viewModel : UploadViewModel by viewModels()
     private lateinit var currentPhotoPath: String
 
-
     private fun hasCameraPermission() =
         EasyPermissions.hasPermissions(requireContext(), Manifest.permission.CAMERA)
 
@@ -48,15 +46,6 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         } else {
             reqCameraPermission()
         }
-    }
-
-    private fun reqCameraPermission() {
-        EasyPermissions.requestPermissions(
-            this,
-            "This feature requires camera permission",
-            REQUEST_CODE_PERMISSIONS,
-            Manifest.permission.CAMERA
-        )
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: List<String>) {
@@ -73,10 +62,6 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
 
-    private fun permissionCheck() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(requireActivity().baseContext, it) == PackageManager.PERMISSION_GRANTED
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -88,6 +73,7 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         if (!permissionCheck()) {
             ActivityCompat.requestPermissions(
                 requireActivity(),
@@ -95,13 +81,32 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
                 REQUEST_CODE_PERMISSIONS
             )
         }
-        with(binding) {
+
+        with (binding) {
             btnCamera.setOnClickListener {
                 if (hasCameraPermission()) openCam() else reqCameraPermission()
             }
             btnGallery.setOnClickListener { openGallery() }
             btnUpload.setOnClickListener { upImg() }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun permissionCheck() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(requireActivity().baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun reqCameraPermission() {
+        EasyPermissions.requestPermissions(
+            this,
+            "This feature requires camera permission",
+            REQUEST_CODE_PERMISSIONS,
+            Manifest.permission.CAMERA
+        )
     }
 
     private fun openCam() {
@@ -177,11 +182,6 @@ class UploadFragment : Fragment(), EasyPermissions.PermissionCallbacks {
                 binding.previewImageView.setImageURI(uri)
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     companion object {
